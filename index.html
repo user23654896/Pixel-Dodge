@@ -36,7 +36,7 @@
         #menu {
             position: absolute;
             width: 100%;
-            top: 15%; /* Menüyü yukarı taşıdık */
+            top: 15%; 
             /* Mobil kaydırma için */
             max-height: 80vh; 
             overflow-y: auto;
@@ -99,24 +99,7 @@
             border-radius: 5px;
             margin-top: 10px;
         }
-        #closeRulesButton {
-            background-color: #F44336;
-            color: white;
-            padding: 15px 30px;
-            font-size: 24px;
-            cursor: pointer;
-            border: none;
-            border-radius: 8px;
-            width: 100%;
-            display: block;
-            margin-top: 30px;
-            
-            /* Sabit buton (içerik kaydırılsa bile altta kalır) */
-            position: sticky; 
-            bottom: 0;
-            z-index: 10;
-        }
-
+        
         /* --- BUTON STİLLERİ --- */
         button {
             padding: 20px 40px; 
@@ -145,6 +128,23 @@
         }
         #fullscreenButton:hover {
             background-color: #1976D2;
+        }
+        
+        /* Kapatma butonu, içerik kaydırılsa bile altta kalır */
+        #closeRulesButton {
+            background-color: #F44336;
+            color: white;
+            padding: 15px 30px;
+            font-size: 24px;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            width: 100%;
+            display: block;
+            margin-top: 30px;
+            position: sticky; 
+            bottom: 0;
+            z-index: 10;
         }
         
         /* --- DOKUNMATİK KONTROL ALANI --- */
@@ -181,7 +181,7 @@
             height: auto;
             font-size: 80px;
             text-shadow: 0 0 10px red;
-            background-color: transparent; /* Arka plan rengini oyun sonu için kaldırıldı */
+            background-color: transparent; 
         }
     </style>
 </head>
