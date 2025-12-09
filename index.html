@@ -8,77 +8,42 @@
         body {
             margin: 0;
             background: #111;
-            overflow: hidden;
+            /* Ana sayfa kaydırmasını engeller, bu önemli */
+            overflow: hidden; 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: white;
             text-align: center;
         }
-        /* Dokunmatik Kontrol Alanı (Mobil) */
-        #touchControls {
-            display: none; 
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 150px;
-            z-index: 50;
-        }
-        .touch-button {
-            position: absolute;
-            bottom: 10px;
-            width: 45%;
-            height: 120px;
-            background-color: rgba(76, 175, 80, 0.7); 
-            border-radius: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 50px;
-            user-select: none; 
-            touch-action: manipulation; 
-        }
-        #leftButton {
-            left: 2%;
-        }
-        #rightButton {
-            right: 2%;
-        }
         
-        /* Genel Arayüz Stilleri */
+        /* Skor Görüntüleme */
+        #scoreDisplay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 40px;
+            font-weight: bold;
+        }
+        #highScoreDisplay {
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            font-size: 30px;
+            font-weight: bold;
+            color: #ffeb3b;
+        }
+
+        /* --- MENÜ ALANI (KAYDIRMA DÜZELTİLDİ) --- */
         #menu {
             position: absolute;
             width: 100%;
-            top: 30%; 
-        }
-        button {
-            padding: 20px 40px; 
-            font-size: 24px;
-            margin: 10px;
-            cursor: pointer;
-            border-radius: 12px;
-            border: none;
-            background-color: #4CAF50;
-            color: white;
-            transition: background-color 0.3s;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        #rulesButton {
-            background-color: #FFC107; 
-            color: black;
-        }
-        #rulesButton:hover {
-            background-color: #ffb300;
-        }
-        #fullscreenButton {
-            background-color: #2196F3;
-        }
-        #fullscreenButton:hover {
-            background-color: #1976D2;
+            top: 15%; /* Menüyü yukarı taşıdık */
+            /* Mobil kaydırma için */
+            max-height: 80vh; 
+            overflow-y: auto;
+            padding-bottom: 50px; 
         }
 
+        /* --- OYUN SONU ve KURALLAR PENCERELERİ --- */
         #rulesOverlay, #gameOver {
             position: fixed; 
             top: 0;
@@ -88,8 +53,10 @@
             display: none;
             z-index: 100;
             background-color: rgba(0, 0, 0, 0.9);
+            text-align: center;
         }
-        /* --- DÜZELTME BURADA YAPILDI --- */
+        
+        /* --- OYUN KURALLARI İÇERİĞİ (KAYDIRMA DÜZELTİLDİ) --- */
         #rulesContent {
             width: 90%;
             max-width: 600px;
@@ -101,11 +68,10 @@
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
             
             /* Mobil Kaydırma Düzeltmesi */
-            max-height: 90vh; /* Ekran yüksekliğinin %90'ı */
-            overflow-y: auto; /* Dikeyde kaydırma çubuğu gerektiğinde çıksın */
-            padding-bottom: 80px; /* Kapatma butonu için alt boşluk */
+            max-height: 90vh; 
+            overflow-y: auto; 
+            padding-bottom: 80px;
         }
-        /* ------------------------------- */
         
         #rulesContent h2 {
             text-align: center;
@@ -134,27 +100,88 @@
             margin-top: 10px;
         }
         #closeRulesButton {
-            /* Kapatma butonunu kaydırma çubuğu ile birlikte hareket ettirmek için */
+            background-color: #F44336;
+            color: white;
+            padding: 15px 30px;
+            font-size: 24px;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            width: 100%;
+            display: block;
+            margin-top: 30px;
+            
+            /* Sabit buton (içerik kaydırılsa bile altta kalır) */
             position: sticky; 
             bottom: 0;
             z-index: 10;
         }
-        
-        /* ... Diğer stiller (scoreDisplay, highScoreDisplay, vb.) ... */
-        #scoreDisplay {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            font-size: 40px;
-            font-weight: bold;
+
+        /* --- BUTON STİLLERİ --- */
+        button {
+            padding: 20px 40px; 
+            font-size: 24px;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 12px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            transition: background-color 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
-        #highScoreDisplay {
+        button:hover {
+            background-color: #45a049;
+        }
+        #rulesButton {
+            background-color: #FFC107; 
+            color: black;
+        }
+        #rulesButton:hover {
+            background-color: #ffb300;
+        }
+        #fullscreenButton {
+            background-color: #2196F3;
+        }
+        #fullscreenButton:hover {
+            background-color: #1976D2;
+        }
+        
+        /* --- DOKUNMATİK KONTROL ALANI --- */
+        #touchControls {
+            display: none; 
             position: absolute;
-            top: 80px;
-            left: 20px;
-            font-size: 30px;
-            font-weight: bold;
-            color: #ffeb3b;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 150px;
+            z-index: 50;
+        }
+        .touch-button {
+            position: absolute;
+            bottom: 10px;
+            width: 45%;
+            height: 120px;
+            background-color: rgba(76, 175, 80, 0.7); 
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 50px;
+            user-select: none; 
+            touch-action: manipulation; 
+        }
+        #leftButton { left: 2%; }
+        #rightButton { right: 2%; }
+        
+        #gameOver {
+            top: 30%;
+            position: absolute;
+            width: 100%;
+            height: auto;
+            font-size: 80px;
+            text-shadow: 0 0 10px red;
+            background-color: transparent; /* Arka plan rengini oyun sonu için kaldırıldı */
         }
     </style>
 </head>
@@ -199,11 +226,13 @@
         <button id="closeRulesButton" onclick="toggleRules()">Kapat</button>
     </div>
 </div>
+
 <div id="menu">
     <h1 style="font-size: 80px; color: #ffeb3b;">🚀 2D Kaçınma Oyunu</h1>
     <h2 style="font-size: 40px;">En Yüksek Skor: <span id="menuHighScore">0</span></h2>
     
     <button id="rulesButton" onclick="toggleRules()">Oyun Kuralları</button>
+    <button id="fullscreenButton" onclick="toggleFullscreen()">Tam Ekrana Al</button> 
     
     <br>
     <button onclick="startGame('easy')">Kolay</button>
@@ -212,7 +241,7 @@
 </div>
 
 <div id="gameOver">
-    <div style="padding-top: 10%;">
+    <div>
         GAME OVER<br>
         Final Score: <span id="finalScore">0</span><br>
         <div id="newHighScoreText" style="color: yellow; font-size: 40px; margin-top: 10px; display: none;">YENİ EN YÜKSEK SKOR!</div><br>
@@ -234,6 +263,7 @@
     const touchControls = document.getElementById("touchControls"); 
     const leftButton = document.getElementById("leftButton");     
     const rightButton = document.getElementById("rightButton");   
+    const menuDiv = document.getElementById("menu");
 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -259,6 +289,7 @@
         speed: 15
     };
     
+    // --- OYUNCU HAREKET VE DOKUNMATİK KONTROLLER ---
     function movePlayer(direction) {
         if (!alive) return;
         if (direction === 'left') {
@@ -296,6 +327,7 @@
     rightButton.addEventListener('mouseup', stopMoving);
     rightButton.addEventListener('mouseleave', stopMoving);
 
+    // --- YÜKSEK SKOR İŞLEVLERİ ---
     function getHighScore() {
         const highscore = localStorage.getItem('2d_game_highscore');
         return highscore ? parseInt(highscore) : 0;
@@ -318,11 +350,12 @@
     
     updateScoreDisplays();
     
+    // --- OYUN AKIŞ KONTROLÜ ---
     function startGame(mode) {
         cancelAnimationFrame(gameInterval);
         clearTimeout(spawnTimeout);
         
-        document.getElementById("menu").style.display = "none";
+        menuDiv.style.display = "none";
         document.getElementById("gameOver").style.display = "none";
         newHighScoreText.style.display = "none";
         touchControls.style.display = "flex"; 
@@ -441,6 +474,7 @@
         startGame("easy"); 
     }
     
+    // --- GÖRÜNTÜ VE BOYUTLANDIRMA ---
     function toggleFullscreen() {
         const doc = document.documentElement;
         
@@ -470,16 +504,18 @@
     window.addEventListener('resize', updateCanvasAndPlayerPosition);
     document.addEventListener('fullscreenchange', updateCanvasAndPlayerPosition);
 
+    // --- KURALLAR KONTROLÜ ---
     function toggleRules() {
         if (rulesOverlay.style.display === "block") {
             rulesOverlay.style.display = "none";
-            document.getElementById("menu").style.display = "block"; 
+            menuDiv.style.display = "block"; 
         } else {
             rulesOverlay.style.display = "block";
-            document.getElementById("menu").style.display = "none"; 
+            menuDiv.style.display = "none"; 
         }
     }
 
+    // --- PC KLAVYE KONTROLLERİ ---
     window.addEventListener("keydown", e => {
         if (!alive) return;
         
