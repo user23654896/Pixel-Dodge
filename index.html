@@ -2,7 +2,8 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Gelişmiş 2D Kaçınma Oyunu</title>
+    <title>Responsive 2D Kaçınma Oyunu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         body {
             margin: 0;
@@ -12,15 +13,47 @@
             color: white;
             text-align: center;
         }
+        /* Dokunmatik Kontrol Alanı (Mobil) */
+        #touchControls {
+            display: none; /* Başlangıçta gizli */
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 150px;
+            z-index: 50;
+        }
+        .touch-button {
+            position: absolute;
+            bottom: 10px;
+            width: 45%;
+            height: 120px;
+            background-color: rgba(76, 175, 80, 0.7); /* Yarı saydam yeşil */
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 50px;
+            user-select: none; 
+            touch-action: manipulation; 
+        }
+        #leftButton {
+            left: 2%;
+        }
+        #rightButton {
+            right: 2%;
+        }
+        
+        /* Genel Arayüz Stilleri */
         #menu {
             position: absolute;
             width: 100%;
-            top: 30%;
+            top: 30%; 
         }
         button {
-            padding: 25px 50px;
-            font-size: 30px;
-            margin: 15px;
+            padding: 20px 40px; 
+            font-size: 24px;
+            margin: 10px;
             cursor: pointer;
             border-radius: 12px;
             border: none;
@@ -32,8 +65,8 @@
         button:hover {
             background-color: #45a049;
         }
-        #rulesButton { /* Oyun Kuralları Butonu Stili */
-            background-color: #FFC107; /* Sarı renk */
+        #rulesButton {
+            background-color: #FFC107; 
             color: black;
         }
         #rulesButton:hover {
@@ -46,46 +79,20 @@
             background-color: #1976D2;
         }
 
-        #gameOver {
-            display: none;
-            position: absolute;
-            top: 30%;
-            width: 100%;
-            font-size: 80px;
-            text-shadow: 0 0 10px red;
-        }
-        #scoreDisplay {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            font-size: 40px;
-            font-weight: bold;
-        }
-        #highScoreDisplay {
-            position: absolute;
-            top: 80px;
-            left: 20px;
-            font-size: 30px;
-            font-weight: bold;
-            color: #ffeb3b;
-        }
-
-        /* --- OYUN KURALLARI PENCERESİ STİLİ --- */
-        #rulesOverlay {
-            display: none; /* Başlangıçta gizli */
-            position: absolute;
+        #rulesOverlay, #gameOver {
+            position: fixed; 
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.9); /* Yarı saydam siyah arka plan */
-            z-index: 100; /* Diğer elementlerin üstünde olsun */
-            padding-top: 50px;
+            display: none;
+            z-index: 100;
+            background-color: rgba(0, 0, 0, 0.9);
         }
         #rulesContent {
-            width: 80%;
+            width: 90%;
             max-width: 600px;
-            margin: auto;
+            margin: 5% auto; 
             background-color: #333;
             padding: 30px;
             border-radius: 15px;
@@ -99,29 +106,24 @@
         #rulesContent ul {
             font-size: 22px;
             line-height: 1.5;
-            list-style-type: none; /* Listeyi gizle */
+            list-style-type: none;
             padding-left: 0;
         }
         #rulesContent li {
              margin-bottom: 10px;
-             padding-left: 1.5em; /* Madde işareti için boşluk */
-             text-indent: -1.5em; /* Metni geri kaydır */
+             padding-left: 1.5em; 
+             text-indent: -1.5em; 
         }
         #rulesContent li::before {
-             content: "👉"; /* Emoji ile özel madde işareti */
+             content: "👉"; 
              margin-right: 0.5em;
         }
-        #closeRulesButton {
-            display: block;
-            margin-top: 30px;
-            background-color: #F44336; /* Kırmızı kapatma butonu */
-            color: white;
-            padding: 15px 30px;
-            font-size: 24px;
-            cursor: pointer;
-            border: none;
-            border-radius: 8px;
-            width: 100%;
+        .control-list {
+            list-style-type: none;
+            padding: 10px;
+            border: 1px dashed #FFC107;
+            border-radius: 5px;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -132,17 +134,37 @@
 <div id="scoreDisplay">Score: 0</div>
 <div id="highScoreDisplay">High Score: 0</div>
 
+<div id="touchControls">
+    <div id="leftButton" class="touch-button">⬅️</div>
+    <div id="rightButton" class="touch-button">➡️</div>
+</div>
+
 <div id="rulesOverlay">
     <div id="rulesContent">
         <h2>🎮 Oyun Kuralları</h2>
         <ul>
             <li>**Amaç:** Yukarıdan düşen kırmızı karelere çarpmadan mümkün olduğunca uzun süre hayatta kalmak.</li>
-            <li>**Kontrol:** Oyuncuyu hareket ettirmek için **Sağ (➡️)** ve **Sol (⬅️)** ok tuşlarını kullanın.</li>
             <li>**Kazanma:** Düşmanlar ekranın altından geçtiğinde skor kazanırsınız.</li>
             <li>**Kaybetme:** Herhangi bir kırmızı düşmana çarptığınızda oyun biter.</li>
             <li>**Zorluk:** Skorunuz arttıkça düşmanların hızı artar ve daha sık düşmeye başlarlar!</li>
             <li>**Yüksek Skor:** En yüksek skorunuz tarayıcınızda kayıt altında tutulur.</li>
         </ul>
+        
+        <hr style="border-color: #555;">
+        
+        <h3 style="text-align: center; color: #2196F3;">Kontrol Yöntemleri</h3>
+        
+        <ul class="control-list">
+            <li>**💻 PC/Masaüstü Kontrolü:**</li>
+            <li>👉 Sol Hareket: **Sol Ok (⬅️)** tuşu</li>
+            <li>👉 Sağ Hareket: **Sağ Ok (➡️)** tuşu</li>
+        </ul>
+        
+        <ul class="control-list">
+            <li>**📱 Mobil/Dokunmatik Kontrolü:**</li>
+            <li>👉 Hareket: Ekranın altındaki **⬅️ ve ➡️ butonlarına** dokunup basılı tutun.</li>
+        </ul>
+        
         <button id="closeRulesButton" onclick="toggleRules()">Kapat</button>
     </div>
 </div>
@@ -159,16 +181,17 @@
 </div>
 
 <div id="gameOver">
-    GAME OVER<br>
-    Final Score: <span id="finalScore">0</span><br>
-    <div id="newHighScoreText" style="color: yellow; font-size: 40px; margin-top: 10px; display: none;">YENİ EN YÜKSEK SKOR!</div><br>
-    
-    <button id="fullscreenButton" onclick="toggleFullscreen()">Tam Ekrana Al</button> 
-    <button onclick="restartGame()">Yeniden Oyna</button>
+    <div style="padding-top: 10%;">
+        GAME OVER<br>
+        Final Score: <span id="finalScore">0</span><br>
+        <div id="newHighScoreText" style="color: yellow; font-size: 40px; margin-top: 10px; display: none;">YENİ EN YÜKSEK SKOR!</div><br>
+        
+        <button id="fullscreenButton" onclick="toggleFullscreen()">Tam Ekrana Al</button> 
+        <button onclick="restartGame()">Yeniden Oyna</button>
+    </div>
 </div>
 
 <script>
-    // ... (Önceki kodunuzdaki tüm değişkenler buraya kopyalanmalıdır) ...
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
     const scoreDisplay = document.getElementById("scoreDisplay");
@@ -176,9 +199,11 @@
     const highScoreDisplay = document.getElementById("highScoreDisplay");
     const menuHighScoreSpan = document.getElementById("menuHighScore");
     const newHighScoreText = document.getElementById("newHighScoreText");
-    const rulesOverlay = document.getElementById("rulesOverlay"); // Yeni kural öğesi
+    const rulesOverlay = document.getElementById("rulesOverlay");
+    const touchControls = document.getElementById("touchControls"); 
+    const leftButton = document.getElementById("leftButton");     
+    const rightButton = document.getElementById("rightButton");   
 
-    // Canvas ve Pencere Ayarları
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
@@ -203,18 +228,51 @@
         speed: 15
     };
     
-    // --- YENİ OYUN KURALLARI İŞLEVİ ---
-    function toggleRules() {
-        // Kurallar penceresini açıp kapar
-        if (rulesOverlay.style.display === "block") {
-            rulesOverlay.style.display = "none";
-            document.getElementById("menu").style.display = "block"; // Menüyü geri göster
-        } else {
-            rulesOverlay.style.display = "block";
-            document.getElementById("menu").style.display = "none"; // Menüyü gizle
+    // --- OYUNCU HAREKET FONKSİYONU ---
+    function movePlayer(direction) {
+        if (!alive) return;
+        if (direction === 'left') {
+            player.x = Math.max(0, player.x - player.speed);
+        } else if (direction === 'right') {
+            player.x = Math.min(canvas.width - player.w, player.x + player.speed);
         }
     }
-    // --- SKOR VE DİĞER FONKSİYONLAR (Önceki koddan) ---
+
+    // --- DOKUNMATİK KONTROLLER ---
+    let moveInterval;
+
+    const startMoving = (direction) => {
+        if (!moveInterval) {
+            movePlayer(direction);
+            moveInterval = setInterval(() => movePlayer(direction), 1000 / 60); 
+        }
+    };
+
+    const stopMoving = () => {
+        if (moveInterval) {
+            clearInterval(moveInterval);
+            moveInterval = null;
+        }
+    };
+
+    leftButton.addEventListener('touchstart', (e) => { e.preventDefault(); startMoving('left'); });
+    leftButton.addEventListener('touchend', stopMoving);
+    leftButton.addEventListener('touchcancel', stopMoving);
+
+    rightButton.addEventListener('touchstart', (e) => { e.preventDefault(); startMoving('right'); });
+    rightButton.addEventListener('touchend', stopMoving);
+    rightButton.addEventListener('touchcancel', stopMoving);
+
+    leftButton.addEventListener('mousedown', () => startMoving('left'));
+    leftButton.addEventListener('mouseup', stopMoving);
+    leftButton.addEventListener('mouseleave', stopMoving);
+
+    rightButton.addEventListener('mousedown', () => startMoving('right'));
+    rightButton.addEventListener('mouseup', stopMoving);
+    rightButton.addEventListener('mouseleave', stopMoving);
+    // ----------------------------
+
+    // --- SKOR VE DİĞER FONKSİYONLAR ---
 
     function getHighScore() {
         const highscore = localStorage.getItem('2d_game_highscore');
@@ -245,6 +303,7 @@
         document.getElementById("menu").style.display = "none";
         document.getElementById("gameOver").style.display = "none";
         newHighScoreText.style.display = "none";
+        touchControls.style.display = "flex"; 
 
         if (mode === "easy") { initialEnemySpeed = 4; initialSpawnRate = 1000; }
         if (mode === "normal") { initialEnemySpeed = 6; initialSpawnRate = 700; }
@@ -264,7 +323,7 @@
         spawnEnemies();
         gameLoop();
     }
-
+    
     function spawnEnemies() {
         if (!alive) return;
         enemies.push({
@@ -331,7 +390,7 @@
         updateScoreAndDifficulty();
         gameInterval = requestAnimationFrame(gameLoop);
     }
-    
+
     function gameOver() {
         alive = false;
         clearTimeout(spawnTimeout);
@@ -348,6 +407,8 @@
 
         document.getElementById("gameOver").style.display = "block";
         scoreDisplay.style.display = "none";
+        touchControls.style.display = "none"; 
+        stopMoving(); 
     }
 
     function restartGame() {
@@ -387,14 +448,25 @@
     window.addEventListener('resize', updateCanvasAndPlayerPosition);
     document.addEventListener('fullscreenchange', updateCanvasAndPlayerPosition);
 
+    function toggleRules() {
+        if (rulesOverlay.style.display === "block") {
+            rulesOverlay.style.display = "none";
+            document.getElementById("menu").style.display = "block"; 
+        } else {
+            rulesOverlay.style.display = "block";
+            document.getElementById("menu").style.display = "none"; 
+        }
+    }
+
+    // --- PC KLAVYE KONTROLLERİ ---
     window.addEventListener("keydown", e => {
         if (!alive) return;
         
         if (e.key === "ArrowLeft") {
-            player.x = Math.max(0, player.x - player.speed);
+            movePlayer('left');
         }
         if (e.key === "ArrowRight") {
-            player.x = Math.min(canvas.width - player.w, player.x + player.speed);
+            movePlayer('right');
         }
     });
 </script>
