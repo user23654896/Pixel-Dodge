@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gelişmiş 2D Kaçınma Oyunu</title>
+    <style>
+        body {
+            margin: 0;
+            background: #111;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            text-align: center;
+        }
+        #menu {
+            position: absolute;
+            width: 100%;
+            top: 30%;
+        }
+        button {
+            padding: 25px 50px;
+            font-size: 30px;
+            margin: 15px;
+            cursor: pointer;
+            border-radius: 12px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            transition: background-color 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #rulesButton { /* Oyun Kuralları Butonu Stili */
+            background-color: #FFC107; /* Sarı renk */
+            color: black;
+        }
+        #rulesButton:hover {
+            background-color: #ffb300;
+        }
+        #fullscreenButton {
+            background-color: #2196F3;
+        }
+        #fullscreenButton:hover {
+            background-color: #1976D2;
+        }
+
+        #gameOver {
+            display: none;
+            position: absolute;
+            top: 30%;
+            width: 100%;
+            font-size: 80px;
+            text-shadow: 0 0 10px red;
+        }
+        #scoreDisplay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 40px;
+            font-weight: bold;
+        }
+        #highScoreDisplay {
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            font-size: 30px;
+            font-weight: bold;
+            color: #ffeb3b;
+        }
+
+        /* --- OYUN KURALLARI PENCERESİ STİLİ --- */
+        #rulesOverlay {
+            display: none; /* Başlangıçta gizli */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9); /* Yarı saydam siyah arka plan */
+            z-index: 100; /* Diğer elementlerin üstünde olsun */
+            padding-top: 50px;
+        }
+        #rulesContent {
+            width: 80%;
+            max-width: 600px;
+            margin: auto;
+            background-color: #333;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: left;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+        #rulesContent h2 {
+            text-align: center;
+            color: #4CAF50;
+        }
+        #rulesContent ul {
+            font-size: 22px;
+            line-height: 1.5;
+            list-style-type: none; /* Listeyi gizle */
+            padding-left: 0;
+        }
+        #rulesContent li {
+             margin-bottom: 10px;
+             padding-left: 1.5em; /* Madde işareti için boşluk */
+             text-indent: -1.5em; /* Metni geri kaydır */
+        }
+        #rulesContent li::before {
+             content: "👉"; /* Emoji ile özel madde işareti */
+             margin-right: 0.5em;
+        }
+        #closeRulesButton {
+            display: block;
+            margin-top: 30px;
+            background-color: #F44336; /* Kırmızı kapatma butonu */
+            color: white;
+            padding: 15px 30px;
+            font-size: 24px;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="gameCanvas"></canvas>
+
+<div id="scoreDisplay">Score: 0</div>
+<div id="highScoreDisplay">High Score: 0</div>
+
+<div id="rulesOverlay">
+    <div id="rulesContent">
+        <h2>🎮 Oyun Kuralları</h2>
+        <ul>
+            <li>**Amaç:** Yukarıdan düşen kırmızı karelere çarpmadan mümkün olduğunca uzun süre hayatta kalmak.</li>
+            <li>**Kontrol:** Oyuncuyu hareket ettirmek için **Sağ (➡️)** ve **Sol (⬅️)** ok tuşlarını kullanın.</li>
+            <li>**Kazanma:** Düşmanlar ekranın altından geçtiğinde skor kazanırsınız.</li>
+            <li>**Kaybetme:** Herhangi bir kırmızı düşmana çarptığınızda oyun biter.</li>
+            <li>**Zorluk:** Skorunuz arttıkça düşmanların hızı artar ve daha sık düşmeye başlarlar!</li>
+            <li>**Yüksek Skor:** En yüksek skorunuz tarayıcınızda kayıt altında tutulur.</li>
+        </ul>
+        <button id="closeRulesButton" onclick="toggleRules()">Kapat</button>
+    </div>
+</div>
+<div id="menu">
+    <h1 style="font-size: 80px; color: #ffeb3b;">🚀 2D Kaçınma Oyunu</h1>
+    <h2 style="font-size: 40px;">En Yüksek Skor: <span id="menuHighScore">0</span></h2>
+    
+    <button id="rulesButton" onclick="toggleRules()">Oyun Kuralları</button>
+    
+    <br>
+    <button onclick="startGame('easy')">Kolay</button>
+    <button onclick="startGame('normal')">Orta</button>
+    <button onclick="startGame('hard')">Zor</button>
+</div>
+
+<div id="gameOver">
+    GAME OVER<br>
+    Final Score: <span id="finalScore">0</span><br>
+    <div id="newHighScoreText" style="color: yellow; font-size: 40px; margin-top: 10px; display: none;">YENİ EN YÜKSEK SKOR!</div><br>
+    
+    <button id="fullscreenButton" onclick="toggleFullscreen()">Tam Ekrana Al</button> 
+    <button onclick="restartGame()">Yeniden Oyna</button>
+</div>
+
+<script>
+    // ... (Önceki kodunuzdaki tüm değişkenler buraya kopyalanmalıdır) ...
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const scoreDisplay = document.getElementById("scoreDisplay");
+    const finalScoreSpan = document.getElementById("finalScore");
+    const highScoreDisplay = document.getElementById("highScoreDisplay");
+    const menuHighScoreSpan = document.getElementById("menuHighScore");
+    const newHighScoreText = document.getElementById("newHighScoreText");
+    const rulesOverlay = document.getElementById("rulesOverlay"); // Yeni kural öğesi
+
+    // Canvas ve Pencere Ayarları
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let playerImg = new Image();
+    playerImg.src = "character.png"; 
+
+    let enemies = [];
+    let initialEnemySpeed = 4;
+    let initialSpawnRate = 1000;
+    let enemySpeed = initialEnemySpeed;
+    let spawnRate = initialSpawnRate;
+    let score = 0;
+    let alive = false;
+    let gameInterval;
+    let spawnTimeout;
+
+    let player = {
+        w: 80,
+        h: 80,
+        x: canvas.width / 2 - 40,
+        y: canvas.height - 150,
+        speed: 15
+    };
+    
+    // --- YENİ OYUN KURALLARI İŞLEVİ ---
+    function toggleRules() {
+        // Kurallar penceresini açıp kapar
+        if (rulesOverlay.style.display === "block") {
+            rulesOverlay.style.display = "none";
+            document.getElementById("menu").style.display = "block"; // Menüyü geri göster
+        } else {
+            rulesOverlay.style.display = "block";
+            document.getElementById("menu").style.display = "none"; // Menüyü gizle
+        }
+    }
+    // --- SKOR VE DİĞER FONKSİYONLAR (Önceki koddan) ---
+
+    function getHighScore() {
+        const highscore = localStorage.getItem('2d_game_highscore');
+        return highscore ? parseInt(highscore) : 0;
+    }
+
+    function saveScore(currentScore) {
+        const highScore = getHighScore();
+        if (currentScore > highScore) {
+            localStorage.setItem('2d_game_highscore', currentScore);
+            return true;
+        }
+        return false;
+    }
+    
+    function updateScoreDisplays() {
+        const highScore = getHighScore();
+        highScoreDisplay.innerText = "High Score: " + highScore;
+        menuHighScoreSpan.innerText = highScore;
+    }
+    
+    updateScoreDisplays();
+    
+    function startGame(mode) {
+        cancelAnimationFrame(gameInterval);
+        clearTimeout(spawnTimeout);
+        
+        document.getElementById("menu").style.display = "none";
+        document.getElementById("gameOver").style.display = "none";
+        newHighScoreText.style.display = "none";
+
+        if (mode === "easy") { initialEnemySpeed = 4; initialSpawnRate = 1000; }
+        if (mode === "normal") { initialEnemySpeed = 6; initialSpawnRate = 700; }
+        if (mode === "hard") { initialEnemySpeed = 8; initialSpawnRate = 500; }
+        
+        enemySpeed = initialEnemySpeed;
+        spawnRate = initialSpawnRate;
+        alive = true;
+        score = 0;
+        enemies = [];
+        player.x = canvas.width / 2 - player.w / 2; 
+
+        scoreDisplay.style.display = "block";
+        scoreDisplay.innerText = "Score: " + score;
+        updateScoreDisplays();
+
+        spawnEnemies();
+        gameLoop();
+    }
+
+    function spawnEnemies() {
+        if (!alive) return;
+        enemies.push({
+            x: Math.random() * (canvas.width - 40),
+            y: -50,
+            w: 40,
+            h: 40
+        });
+        spawnTimeout = setTimeout(spawnEnemies, spawnRate);
+    }
+
+    function drawPlayer() {
+        if (playerImg.complete && playerImg.naturalWidth !== 0) {
+            ctx.drawImage(playerImg, player.x, player.y, player.w, player.h);
+        } else {
+            ctx.fillStyle = "blue";
+            ctx.fillRect(player.x, player.y, player.w, player.h);
+        }
+    }
+
+    function updateEnemies() {
+        const newEnemies = [];
+        let hit = false;
+        
+        for (let e of enemies) {
+            e.y += enemySpeed;
+            ctx.fillStyle = "red";
+            ctx.fillRect(e.x, e.y, e.w, e.h);
+
+            if (player.x < e.x + e.w && player.x + player.w > e.x &&
+                player.y < e.y + e.h && player.y + player.h > e.y) {
+                hit = true;
+                break;
+            }
+
+            if (e.y > canvas.height) {
+                score++;
+            } else {
+                newEnemies.push(e); 
+            }
+        }
+        
+        enemies = newEnemies;
+        if (hit) {
+            gameOver();
+        }
+    }
+
+    function updateScoreAndDifficulty() {
+        scoreDisplay.innerText = "Score: " + score;
+        
+        if (score > 0 && score % 10 === 0) {
+            enemySpeed = initialEnemySpeed + Math.floor(score / 10) * 0.5;
+            const minSpawnRate = 300;
+            spawnRate = Math.max(minSpawnRate, initialSpawnRate - Math.floor(score / 10) * 50); 
+        }
+    }
+    
+    function gameLoop() {
+        if (!alive) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawPlayer();
+        updateEnemies();
+        updateScoreAndDifficulty();
+        gameInterval = requestAnimationFrame(gameLoop);
+    }
+    
+    function gameOver() {
+        alive = false;
+        clearTimeout(spawnTimeout);
+        cancelAnimationFrame(gameInterval);
+        
+        const isNewHighScore = saveScore(score);
+        updateScoreDisplays();
+        
+        finalScoreSpan.innerText = score;
+        
+        if (isNewHighScore) {
+            newHighScoreText.style.display = "block";
+        }
+
+        document.getElementById("gameOver").style.display = "block";
+        scoreDisplay.style.display = "none";
+    }
+
+    function restartGame() {
+        document.getElementById("gameOver").style.display = "none";
+        if (document.fullscreenElement) {
+             document.exitFullscreen();
+        }
+        startGame("easy"); 
+    }
+    
+    function toggleFullscreen() {
+        const doc = document.documentElement;
+        
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        } 
+        else if (doc.requestFullscreen) {
+            doc.requestFullscreen();
+        } else if (doc.mozRequestFullScreen) {
+            doc.mozRequestFullScreen();
+        } else if (doc.webkitRequestFullscreen) {
+            doc.webkitRequestFullscreen();
+        } else if (doc.msRequestFullscreen) {
+            doc.msRequestFullscreen();
+        }
+        
+        setTimeout(updateCanvasAndPlayerPosition, 50); 
+    }
+    
+    function updateCanvasAndPlayerPosition() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        player.x = canvas.width / 2 - player.w / 2;
+        player.y = canvas.height - 150;
+    }
+
+    window.addEventListener('resize', updateCanvasAndPlayerPosition);
+    document.addEventListener('fullscreenchange', updateCanvasAndPlayerPosition);
+
+    window.addEventListener("keydown", e => {
+        if (!alive) return;
+        
+        if (e.key === "ArrowLeft") {
+            player.x = Math.max(0, player.x - player.speed);
+        }
+        if (e.key === "ArrowRight") {
+            player.x = Math.min(canvas.width - player.w, player.x + player.speed);
+        }
+    });
+</script>
+
+</body>
+</html>
