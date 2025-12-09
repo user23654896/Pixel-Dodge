@@ -15,7 +15,7 @@
         }
         /* Dokunmatik Kontrol Alanı (Mobil) */
         #touchControls {
-            display: none; /* Başlangıçta gizli */
+            display: none; 
             position: absolute;
             bottom: 0;
             left: 0;
@@ -28,7 +28,7 @@
             bottom: 10px;
             width: 45%;
             height: 120px;
-            background-color: rgba(76, 175, 80, 0.7); /* Yarı saydam yeşil */
+            background-color: rgba(76, 175, 80, 0.7); 
             border-radius: 15px;
             display: flex;
             justify-content: center;
@@ -89,6 +89,7 @@
             z-index: 100;
             background-color: rgba(0, 0, 0, 0.9);
         }
+        /* --- DÜZELTME BURADA YAPILDI --- */
         #rulesContent {
             width: 90%;
             max-width: 600px;
@@ -98,7 +99,14 @@
             border-radius: 15px;
             text-align: left;
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            
+            /* Mobil Kaydırma Düzeltmesi */
+            max-height: 90vh; /* Ekran yüksekliğinin %90'ı */
+            overflow-y: auto; /* Dikeyde kaydırma çubuğu gerektiğinde çıksın */
+            padding-bottom: 80px; /* Kapatma butonu için alt boşluk */
         }
+        /* ------------------------------- */
+        
         #rulesContent h2 {
             text-align: center;
             color: #4CAF50;
@@ -124,6 +132,29 @@
             border: 1px dashed #FFC107;
             border-radius: 5px;
             margin-top: 10px;
+        }
+        #closeRulesButton {
+            /* Kapatma butonunu kaydırma çubuğu ile birlikte hareket ettirmek için */
+            position: sticky; 
+            bottom: 0;
+            z-index: 10;
+        }
+        
+        /* ... Diğer stiller (scoreDisplay, highScoreDisplay, vb.) ... */
+        #scoreDisplay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 40px;
+            font-weight: bold;
+        }
+        #highScoreDisplay {
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            font-size: 30px;
+            font-weight: bold;
+            color: #ffeb3b;
         }
     </style>
 </head>
@@ -228,7 +259,6 @@
         speed: 15
     };
     
-    // --- OYUNCU HAREKET FONKSİYONU ---
     function movePlayer(direction) {
         if (!alive) return;
         if (direction === 'left') {
@@ -238,9 +268,7 @@
         }
     }
 
-    // --- DOKUNMATİK KONTROLLER ---
     let moveInterval;
-
     const startMoving = (direction) => {
         if (!moveInterval) {
             movePlayer(direction);
@@ -258,21 +286,15 @@
     leftButton.addEventListener('touchstart', (e) => { e.preventDefault(); startMoving('left'); });
     leftButton.addEventListener('touchend', stopMoving);
     leftButton.addEventListener('touchcancel', stopMoving);
-
     rightButton.addEventListener('touchstart', (e) => { e.preventDefault(); startMoving('right'); });
     rightButton.addEventListener('touchend', stopMoving);
     rightButton.addEventListener('touchcancel', stopMoving);
-
     leftButton.addEventListener('mousedown', () => startMoving('left'));
     leftButton.addEventListener('mouseup', stopMoving);
     leftButton.addEventListener('mouseleave', stopMoving);
-
     rightButton.addEventListener('mousedown', () => startMoving('right'));
     rightButton.addEventListener('mouseup', stopMoving);
     rightButton.addEventListener('mouseleave', stopMoving);
-    // ----------------------------
-
-    // --- SKOR VE DİĞER FONKSİYONLAR ---
 
     function getHighScore() {
         const highscore = localStorage.getItem('2d_game_highscore');
@@ -458,7 +480,6 @@
         }
     }
 
-    // --- PC KLAVYE KONTROLLERİ ---
     window.addEventListener("keydown", e => {
         if (!alive) return;
         
