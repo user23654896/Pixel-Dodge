@@ -45,8 +45,7 @@
             z-index: 10;
         }
 
-        /* --- OYUN SONU ve KURALLAR PENCERELERİ --- */
-        /* position: fixed ve height: 100% ile tüm ekranı kaplar */
+        /* --- OYUN SONU ve KURALLAR PENCERELERİ (Kaydırma Düzeltmesi Burada) --- */
         #rulesOverlay, #gameOver {
             position: fixed; 
             top: 0;
@@ -62,7 +61,7 @@
             justify-content: center;
             align-items: flex-start; /* İçeriği yukarıdan başlat */
             
-            /* ÖNEMLİ: İçeriğin kaydırılmasını sağlar */
+            /* *ÖNEMLİ:* İçeriğin kaydırılmasını sağlar */
             overflow-y: auto; 
             padding: 20px 0; 
             box-sizing: border-box;
@@ -79,9 +78,8 @@
             text-align: left;
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
             
-            /* Mobil Kaydırma Düzeltmesi */
             max-height: 90vh; 
-            overflow-y: visible; /* Kendi kaydırması yerine ana overlay kaydırır */
+            overflow-y: visible;
             padding-bottom: 80px;
         }
         
@@ -141,6 +139,13 @@
         #fullscreenButton:hover {
             background-color: #1976D2;
         }
+        /* YENİ BUTON STİLİ */
+        #menuButton {
+            background-color: #f44336; /* Kırmızı renk */
+        }
+        #menuButton:hover {
+            background-color: #d32f2f;
+        }
         
         /* Kapatma butonu, içerik kaydırılsa bile altta kalır */
         #closeRulesButton {
@@ -161,18 +166,17 @@
         
         /* --- DOKUNMATİK KONTROL ALANI --- */
         #touchControls {
-            display: none; 
+            /* display: none; JS ile kontrol edilecek */
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
             height: 150px;
             z-index: 50;
-            display: flex; /* Varsayılan olarak flex kalsın, JS ile kontrol edilecek */
             justify-content: space-between;
         }
         .touch-button {
-            position: absolute; /* Touch controls div'i içindeki konumlandırma */
+            position: absolute;
             bottom: 10px;
             width: 45%;
             height: 120px;
@@ -194,7 +198,7 @@
             max-width: 600px;
             margin: 10% auto; /* Üstten %10 boşluk bırakarak ortalamaya yakınlaştırır */
             padding: 20px;
-            background-color: #222; /* Daha iyi görünürlük için arka plan ekle */
+            background-color: #222; 
             border-radius: 15px;
             box-shadow: 0 0 20px rgba(255, 0, 0, 0.7);
             
@@ -265,7 +269,7 @@
         Final Score: <span id="finalScore">0</span><br>
         <div id="newHighScoreText" style="color: yellow; font-size: 40px; margin-top: 10px; display: none;">YENİ EN YÜKSEK SKOR!</div><br>
         
-        <button id="fullscreenButton" onclick="toggleFullscreen()">Tam Ekrana Al</button> 
+        <button id="menuButton" onclick="goToMainMenu()">Ana Menü</button> <button id="fullscreenButton" onclick="toggleFullscreen()">Tam Ekrana Al</button> 
         <button onclick="restartGame()">Yeniden Oyna</button>
     </div>
 </div>
@@ -288,7 +292,6 @@
     canvas.height = window.innerHeight;
 
     let playerImg = new Image();
-    // Karakter dosyanızın aynı dizinde olduğundan emin olun
     playerImg.src = "character.png"; 
 
     let enemies = [];
@@ -323,7 +326,6 @@
     const startMoving = (direction) => {
         if (!moveInterval) {
             movePlayer(direction);
-            // 60 FPS hızında hareketi sürekli tetikle
             moveInterval = setInterval(() => movePlayer(direction), 1000 / 60); 
         }
     };
@@ -335,7 +337,6 @@
         }
     };
 
-    // Dokunmatik ve Fare olayları
     const addTouchEvents = (element, direction) => {
         element.addEventListener('touchstart', (e) => { e.preventDefault(); startMoving(direction); });
         element.addEventListener('touchend', stopMoving);
@@ -343,7 +344,6 @@
         element.addEventListener('mousedown', () => startMoving(direction));
         element.addEventListener('mouseup', stopMoving);
         element.addEventListener('mouseleave', stopMoving);
-        // Fare bırakıldığında da durdur
         window.addEventListener('mouseup', () => { 
             if (moveInterval) stopMoving(); 
         });
@@ -351,7 +351,6 @@
 
     addTouchEvents(leftButton, 'left');
     addTouchEvents(rightButton, 'right');
-
 
     // --- YÜKSEK SKOR İŞLEVLERİ ---
     function getHighScore() {
@@ -384,7 +383,6 @@
         menuDiv.style.display = "none";
         document.getElementById("gameOver").style.display = "none";
         newHighScoreText.style.display = "none";
-        // Oyunu başlatırken dokunmatik kontrolleri göster
         touchControls.style.display = "flex"; 
 
         if (mode === "easy") { initialEnemySpeed = 4; initialSpawnRate = 1000; }
@@ -419,7 +417,6 @@
     }
 
     function drawPlayer() {
-        // playerImg.src doğru ayarlanmışsa resmi kullan, yoksa mavi kare çiz
         if (playerImg.complete && playerImg.naturalWidth !== 0) {
             ctx.drawImage(playerImg, player.x, player.y, player.w, player.h);
         } else {
@@ -437,7 +434,6 @@
             ctx.fillStyle = "red";
             ctx.fillRect(e.x, e.y, e.w, e.h);
 
-            // Çarpışma Kontrolü (AABB)
             if (player.x < e.x + e.w && player.x + player.w > e.x &&
                 player.y < e.y + e.h && player.y + player.h > e.y) {
                 hit = true;
@@ -460,7 +456,6 @@
     function updateScoreAndDifficulty() {
         scoreDisplay.innerText = "Score: " + score;
         
-        // Her 10 skorda bir zorluğu artır
         if (score > 0 && score % 10 === 0) {
             enemySpeed = initialEnemySpeed + Math.floor(score / 10) * 0.5;
             const minSpawnRate = 300;
@@ -491,7 +486,7 @@
             newHighScoreText.style.display = "block";
         }
 
-        // JS'te display: flex olarak ayarla, CSS'teki değişikliğe uygun
+        // Kaydırma düzeltmesi için display: flex kullanıyoruz
         document.getElementById("gameOver").style.display = "flex"; 
         scoreDisplay.style.display = "none";
         highScoreDisplay.style.display = "none";
@@ -501,14 +496,32 @@
 
     function restartGame() {
         document.getElementById("gameOver").style.display = "none";
-        // Tam ekrandan çıkmak için
         if (document.fullscreenElement) {
              document.exitFullscreen();
         }
-        // Kolay modda yeniden başlat
         startGame("easy"); 
     }
     
+    // YENİ FONKSİYON: Ana Menüye Dönüş
+    function goToMainMenu() {
+        alive = false;
+        clearTimeout(spawnTimeout);
+        cancelAnimationFrame(gameInterval);
+        stopMoving(); 
+        
+        document.getElementById("gameOver").style.display = "none";
+        scoreDisplay.style.display = "none";
+        highScoreDisplay.style.display = "none";
+        touchControls.style.display = "none";
+        
+        menuDiv.style.display = "block";
+        
+        if (document.fullscreenElement) {
+             document.exitFullscreen();
+        }
+        updateScoreDisplays();
+    }
+
     // --- GÖRÜNTÜ VE BOYUTLANDIRMA ---
     function toggleFullscreen() {
         const doc = document.documentElement;
@@ -526,14 +539,12 @@
             doc.msRequestFullscreen();
         }
         
-        // Boyutlandırma sonrası oyuncu pozisyonunu güncelle
         setTimeout(updateCanvasAndPlayerPosition, 50); 
     }
     
     function updateCanvasAndPlayerPosition() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        // Oyuncuyu ekranın altına ortala
         player.x = canvas.width / 2 - player.w / 2;
         player.y = canvas.height - 150;
     }
@@ -547,7 +558,6 @@
             rulesOverlay.style.display = "none";
             menuDiv.style.display = "block"; 
         } else {
-            // RulesOverlay display: flex kullanıyor
             rulesOverlay.style.display = "flex";
             menuDiv.style.display = "none"; 
         }
@@ -558,7 +568,6 @@
         if (!alive) return;
         
         if (e.key === "ArrowLeft") {
-            // Sürekli hareket yerine tek adım hareket için
             movePlayer('left');
         }
         if (e.key === "ArrowRight") {
@@ -566,7 +575,6 @@
         }
     });
 
-    // Başlangıçta Canvas boyutunu ayarla
     updateCanvasAndPlayerPosition();
 </script>
 
