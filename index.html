@@ -22,6 +22,7 @@
             left: 20px;
             font-size: 40px;
             font-weight: bold;
+            z-index: 5;
         }
         #highScoreDisplay {
             position: absolute;
@@ -30,20 +31,22 @@
             font-size: 30px;
             font-weight: bold;
             color: #ffeb3b;
+            z-index: 5;
         }
 
-        /* --- MENÜ ALANI (KAYDIRMA DÜZELTİLDİ) --- */
+        /* --- MENÜ ALANI --- */
         #menu {
             position: absolute;
             width: 100%;
             top: 15%; 
-            /* Mobil kaydırma için */
             max-height: 80vh; 
             overflow-y: auto;
             padding-bottom: 50px; 
+            z-index: 10;
         }
 
         /* --- OYUN SONU ve KURALLAR PENCERELERİ --- */
+        /* position: fixed ve height: 100% ile tüm ekranı kaplar */
         #rulesOverlay, #gameOver {
             position: fixed; 
             top: 0;
@@ -53,10 +56,19 @@
             display: none;
             z-index: 100;
             background-color: rgba(0, 0, 0, 0.9);
-            text-align: center;
+            
+            /* İçeriği dikey olarak ortalamaya yakın konumlandırmak için */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* İçeriği yukarıdan başlat */
+            
+            /* ÖNEMLİ: İçeriğin kaydırılmasını sağlar */
+            overflow-y: auto; 
+            padding: 20px 0; 
+            box-sizing: border-box;
         }
         
-        /* --- OYUN KURALLARI İÇERİĞİ (KAYDIRMA DÜZELTİLDİ) --- */
+        /* --- OYUN KURALLARI İÇERİĞİ --- */
         #rulesContent {
             width: 90%;
             max-width: 600px;
@@ -69,7 +81,7 @@
             
             /* Mobil Kaydırma Düzeltmesi */
             max-height: 90vh; 
-            overflow-y: auto; 
+            overflow-y: visible; /* Kendi kaydırması yerine ana overlay kaydırır */
             padding-bottom: 80px;
         }
         
@@ -156,9 +168,11 @@
             width: 100%;
             height: 150px;
             z-index: 50;
+            display: flex; /* Varsayılan olarak flex kalsın, JS ile kontrol edilecek */
+            justify-content: space-between;
         }
         .touch-button {
-            position: absolute;
+            position: absolute; /* Touch controls div'i içindeki konumlandırma */
             bottom: 10px;
             width: 45%;
             height: 120px;
@@ -174,11 +188,16 @@
         #leftButton { left: 2%; }
         #rightButton { right: 2%; }
         
-        #gameOver {
-            top: 30%;
-            position: absolute;
-            width: 100%;
-            height: auto;
+        /* --- GAME OVER EKRAN İÇERİĞİ --- */
+        #gameOver > div {
+            width: 90%; 
+            max-width: 600px;
+            margin: 10% auto; /* Üstten %10 boşluk bırakarak ortalamaya yakınlaştırır */
+            padding: 20px;
+            background-color: #222; /* Daha iyi görünürlük için arka plan ekle */
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.7);
+            
             font-size: 80px;
             text-shadow: 0 0 10px red;
             background-color: transparent; 
@@ -192,20 +211,20 @@
 <div id="scoreDisplay">Score: 0</div>
 <div id="highScoreDisplay">High Score: 0</div>
 
-<div id="touchControls">
-    <div id="leftButton" class="touch-button">⬅️</div>
-    <div id="rightButton" class="touch-button">➡️</div>
+<div id="touchControls" style="display: none;">
+    <div id="leftButton" class="touch-button">⬅</div>
+    <div id="rightButton" class="touch-button">➡</div>
 </div>
 
 <div id="rulesOverlay">
     <div id="rulesContent">
         <h2>🎮 Oyun Kuralları</h2>
         <ul>
-            <li>**Amaç:** Yukarıdan düşen kırmızı karelere çarpmadan mümkün olduğunca uzun süre hayatta kalmak.</li>
-            <li>**Kazanma:** Düşmanlar ekranın altından geçtiğinde skor kazanırsınız.</li>
-            <li>**Kaybetme:** Herhangi bir kırmızı düşmana çarptığınızda oyun biter.</li>
-            <li>**Zorluk:** Skorunuz arttıkça düşmanların hızı artar ve daha sık düşmeye başlarlar!</li>
-            <li>**Yüksek Skor:** En yüksek skorunuz tarayıcınızda kayıt altında tutulur.</li>
+            <li>*Amaç:* Yukarıdan düşen kırmızı karelere çarpmadan mümkün olduğunca uzun süre hayatta kalmak.</li>
+            <li>*Kazanma:* Düşmanlar ekranın altından geçtiğinde skor kazanırsınız.</li>
+            <li>*Kaybetme:* Herhangi bir kırmızı düşmana çarptığınızda oyun biter.</li>
+            <li>*Zorluk:* Skorunuz arttıkça düşmanların hızı artar ve daha sık düşmeye başlarlar!</li>
+            <li>*Yüksek Skor:* En yüksek skorunuz tarayıcınızda kayıt altında tutulur.</li>
         </ul>
         
         <hr style="border-color: #555;">
@@ -213,14 +232,14 @@
         <h3 style="text-align: center; color: #2196F3;">Kontrol Yöntemleri</h3>
         
         <ul class="control-list">
-            <li>**💻 PC/Masaüstü Kontrolü:**</li>
-            <li>👉 Sol Hareket: **Sol Ok (⬅️)** tuşu</li>
-            <li>👉 Sağ Hareket: **Sağ Ok (➡️)** tuşu</li>
+            <li>💻 PC/Masaüstü Kontrolü:</li>
+            <li>👉 Sol Hareket: *Sol Ok (⬅)* tuşu</li>
+            <li>👉 Sağ Hareket: *Sağ Ok (➡)* tuşu</li>
         </ul>
         
         <ul class="control-list">
-            <li>**📱 Mobil/Dokunmatik Kontrolü:**</li>
-            <li>👉 Hareket: Ekranın altındaki **⬅️ ve ➡️ butonlarına** dokunup basılı tutun.</li>
+            <li>📱 Mobil/Dokunmatik Kontrolü:</li>
+            <li>👉 Hareket: Ekranın altındaki *⬅ ve ➡ butonlarına* dokunup basılı tutun.</li>
         </ul>
         
         <button id="closeRulesButton" onclick="toggleRules()">Kapat</button>
@@ -240,7 +259,7 @@
     <button onclick="startGame('hard')">Zor</button>
 </div>
 
-<div id="gameOver">
+<div id="gameOver" style="display: none;">
     <div>
         GAME OVER<br>
         Final Score: <span id="finalScore">0</span><br>
@@ -269,6 +288,7 @@
     canvas.height = window.innerHeight;
 
     let playerImg = new Image();
+    // Karakter dosyanızın aynı dizinde olduğundan emin olun
     playerImg.src = "character.png"; 
 
     let enemies = [];
@@ -303,6 +323,7 @@
     const startMoving = (direction) => {
         if (!moveInterval) {
             movePlayer(direction);
+            // 60 FPS hızında hareketi sürekli tetikle
             moveInterval = setInterval(() => movePlayer(direction), 1000 / 60); 
         }
     };
@@ -314,18 +335,23 @@
         }
     };
 
-    leftButton.addEventListener('touchstart', (e) => { e.preventDefault(); startMoving('left'); });
-    leftButton.addEventListener('touchend', stopMoving);
-    leftButton.addEventListener('touchcancel', stopMoving);
-    rightButton.addEventListener('touchstart', (e) => { e.preventDefault(); startMoving('right'); });
-    rightButton.addEventListener('touchend', stopMoving);
-    rightButton.addEventListener('touchcancel', stopMoving);
-    leftButton.addEventListener('mousedown', () => startMoving('left'));
-    leftButton.addEventListener('mouseup', stopMoving);
-    leftButton.addEventListener('mouseleave', stopMoving);
-    rightButton.addEventListener('mousedown', () => startMoving('right'));
-    rightButton.addEventListener('mouseup', stopMoving);
-    rightButton.addEventListener('mouseleave', stopMoving);
+    // Dokunmatik ve Fare olayları
+    const addTouchEvents = (element, direction) => {
+        element.addEventListener('touchstart', (e) => { e.preventDefault(); startMoving(direction); });
+        element.addEventListener('touchend', stopMoving);
+        element.addEventListener('touchcancel', stopMoving);
+        element.addEventListener('mousedown', () => startMoving(direction));
+        element.addEventListener('mouseup', stopMoving);
+        element.addEventListener('mouseleave', stopMoving);
+        // Fare bırakıldığında da durdur
+        window.addEventListener('mouseup', () => { 
+            if (moveInterval) stopMoving(); 
+        });
+    };
+
+    addTouchEvents(leftButton, 'left');
+    addTouchEvents(rightButton, 'right');
+
 
     // --- YÜKSEK SKOR İŞLEVLERİ ---
     function getHighScore() {
@@ -358,6 +384,7 @@
         menuDiv.style.display = "none";
         document.getElementById("gameOver").style.display = "none";
         newHighScoreText.style.display = "none";
+        // Oyunu başlatırken dokunmatik kontrolleri göster
         touchControls.style.display = "flex"; 
 
         if (mode === "easy") { initialEnemySpeed = 4; initialSpawnRate = 1000; }
@@ -372,6 +399,7 @@
         player.x = canvas.width / 2 - player.w / 2; 
 
         scoreDisplay.style.display = "block";
+        highScoreDisplay.style.display = "block";
         scoreDisplay.innerText = "Score: " + score;
         updateScoreDisplays();
 
@@ -391,6 +419,7 @@
     }
 
     function drawPlayer() {
+        // playerImg.src doğru ayarlanmışsa resmi kullan, yoksa mavi kare çiz
         if (playerImg.complete && playerImg.naturalWidth !== 0) {
             ctx.drawImage(playerImg, player.x, player.y, player.w, player.h);
         } else {
@@ -408,6 +437,7 @@
             ctx.fillStyle = "red";
             ctx.fillRect(e.x, e.y, e.w, e.h);
 
+            // Çarpışma Kontrolü (AABB)
             if (player.x < e.x + e.w && player.x + player.w > e.x &&
                 player.y < e.y + e.h && player.y + player.h > e.y) {
                 hit = true;
@@ -430,6 +460,7 @@
     function updateScoreAndDifficulty() {
         scoreDisplay.innerText = "Score: " + score;
         
+        // Her 10 skorda bir zorluğu artır
         if (score > 0 && score % 10 === 0) {
             enemySpeed = initialEnemySpeed + Math.floor(score / 10) * 0.5;
             const minSpawnRate = 300;
@@ -460,17 +491,21 @@
             newHighScoreText.style.display = "block";
         }
 
-        document.getElementById("gameOver").style.display = "block";
+        // JS'te display: flex olarak ayarla, CSS'teki değişikliğe uygun
+        document.getElementById("gameOver").style.display = "flex"; 
         scoreDisplay.style.display = "none";
+        highScoreDisplay.style.display = "none";
         touchControls.style.display = "none"; 
         stopMoving(); 
     }
 
     function restartGame() {
         document.getElementById("gameOver").style.display = "none";
+        // Tam ekrandan çıkmak için
         if (document.fullscreenElement) {
              document.exitFullscreen();
         }
+        // Kolay modda yeniden başlat
         startGame("easy"); 
     }
     
@@ -491,12 +526,14 @@
             doc.msRequestFullscreen();
         }
         
+        // Boyutlandırma sonrası oyuncu pozisyonunu güncelle
         setTimeout(updateCanvasAndPlayerPosition, 50); 
     }
     
     function updateCanvasAndPlayerPosition() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
+        // Oyuncuyu ekranın altına ortala
         player.x = canvas.width / 2 - player.w / 2;
         player.y = canvas.height - 150;
     }
@@ -506,11 +543,12 @@
 
     // --- KURALLAR KONTROLÜ ---
     function toggleRules() {
-        if (rulesOverlay.style.display === "block") {
+        if (rulesOverlay.style.display === "flex") {
             rulesOverlay.style.display = "none";
             menuDiv.style.display = "block"; 
         } else {
-            rulesOverlay.style.display = "block";
+            // RulesOverlay display: flex kullanıyor
+            rulesOverlay.style.display = "flex";
             menuDiv.style.display = "none"; 
         }
     }
@@ -520,12 +558,16 @@
         if (!alive) return;
         
         if (e.key === "ArrowLeft") {
+            // Sürekli hareket yerine tek adım hareket için
             movePlayer('left');
         }
         if (e.key === "ArrowRight") {
             movePlayer('right');
         }
     });
+
+    // Başlangıçta Canvas boyutunu ayarla
+    updateCanvasAndPlayerPosition();
 </script>
 
 </body>
